@@ -18,6 +18,26 @@ public class Symbol {
     this.isEpsilon = isEpsilon;
   }
 
+  Symbol(String name, boolean isTerminal) {
+    this(name, isTerminal, false);
+  }
+
+  Symbol(String name) {
+    this(name, true);
+  }
+
+  public String getName() {
+    return this.name;
+  }
+
+  public boolean isTerminal() {
+    return this.isTerminal;
+  }
+
+  public boolean isEpsilon() {
+    return this.isEpsilon;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

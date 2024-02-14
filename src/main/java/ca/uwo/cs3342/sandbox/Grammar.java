@@ -20,8 +20,24 @@ public class Grammar {
     return new ArrayList<>(symbolsMap.values());
   }
 
+  public List<Symbol> getTerminals() {
+    return symbolsMap.values().stream().filter(Symbol::isTerminal).collect(Collectors.toList());
+  }
+
   public List<Production<Symbol>> getProductions() {
     return productions;
+  }
+
+  public Symbol getStartSymbol() {
+    return productions.get(0).leftHandSide;
+  }
+
+  public Symbol getEpsilonSymbol() {
+    return symbolsMap.get(GrammarConstants.EPSILON);
+  }
+
+  public Symbol getEndOfInputSymbol() {
+    return symbolsMap.get(GrammarConstants.END_OF_INPUT);
   }
 
   @Override

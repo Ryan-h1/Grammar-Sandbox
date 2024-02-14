@@ -24,7 +24,8 @@ public class GrammarFactory implements GrammarConstants {
       productions.add(
           new Production<>(
               symbolsMap.get(production.leftHandSide),
-              production.rightHandSide.stream().map(symbolsMap::get).collect(Collectors.toList())));
+              production.rightHandSide.stream().map(symbolsMap::get).collect(Collectors.toList()),
+              production.id));
     }
 
     return new Grammar(symbolsMap, productions);

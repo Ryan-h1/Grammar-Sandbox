@@ -4,12 +4,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 public class LLGrammar extends Grammar implements GrammarConstants {
-  Symbol epsilonSymbol;
 
   public LLGrammar(Grammar grammar) {
     super(grammar.symbolsMap, grammar.productions);
-
-    this.epsilonSymbol = this.symbolsMap.get(EPSILON);
 
     calculateFirstSets();
     calculateFollowSets();
@@ -79,7 +76,7 @@ public class LLGrammar extends Grammar implements GrammarConstants {
             if (i < rhs.size() - 1) {
               List<Symbol> beta = rhs.subList(i + 1, rhs.size());
               LinkedHashSet<Symbol> firstBeta = string_FIRST(beta);
-              firstBeta.remove(epsilonSymbol); // Remove ε if present.
+              firstBeta.remove(this.symbolsMap.get(EPSILON)); // Remove ε if present.
               followB.addAll(firstBeta);
             }
 
@@ -105,7 +102,7 @@ public class LLGrammar extends Grammar implements GrammarConstants {
         p.predictSet.addAll(string_FIRST(alpha)); // PREDICT(A -> α) = FIRST(α)
       } else { // If ε is in FIRST(α)
         p.predictSet.addAll(string_FIRST(alpha));
-        p.predictSet.remove(epsilonSymbol); // Remove ε
+        p.predictSet.remove(this.symbolsMap.get(EPSILON)); // Remove ε
         p.predictSet.addAll(A.followSet); // PREDICT(A -> α) = (FIRST(α) - {ε}) ∪ FOLLOW(A)
       }
     }
@@ -117,7 +114,7 @@ public class LLGrammar extends Grammar implements GrammarConstants {
 
     // Check if all symbols can derive ε
     for (Symbol s : symbols) {
-      if (!s.isEpsilon && !s.firstSet.contains(epsilonSymbol)) {
+      if (!s.isEpsilon && !s.firstSet.contains(this.symbolsMap.get(EPSILON))) {
         return false;
       }
     }
@@ -129,15 +126,15 @@ public class LLGrammar extends Grammar implements GrammarConstants {
     for (Symbol s : symbols) {
       result.addAll(s.firstSet);
       // If ε is not in FIRST(s), we stop adding FIRST sets
-      if (!s.firstSet.contains(epsilonSymbol)) {
+      if (!s.firstSet.contains(this.symbolsMap.get(EPSILON))) {
         break;
       }
       // Remove ε as it only applies if all preceding symbols can derive ε
-      result.remove(epsilonSymbol);
+      result.remove(this.symbolsMap.get(EPSILON));
     }
     // If all symbols can derive ε, we add ε at the end
     if (string_EPS(symbols)) {
-      result.add(epsilonSymbol);
+      result.add(this.symbolsMap.get(EPSILON));
     }
     return result;
   }

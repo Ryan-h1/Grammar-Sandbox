@@ -1,5 +1,8 @@
 package ca.uwo.cs3342.sandbox;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
   public static void main(String[] args) {
     GrammarForm grammarForm = new GrammarForm();
@@ -32,5 +35,19 @@ public class Main {
     grammar.printFollowSets();
     System.out.println();
     grammar.printPredictSets();
+
+    LLParser parser = new LLParser(grammar);
+
+    System.out.println();
+    parser.printParseTable();
+
+    List<Symbol> inputTokens = new ArrayList<>();
+
+    inputTokens.add(new Symbol("id"));
+    inputTokens.add(new Symbol(":=")); // We have no predict set with this token???
+    inputTokens.add(new Symbol("number"));
+    inputTokens.add(new Symbol("$$")); // (end of input symbol)
+
+    ParseTreeNode.printParseTree(parser.parse(inputTokens));
   }
 }

@@ -12,7 +12,7 @@ public class GrammarForm {
   public void addProduction(String lhs, String... rhsSymbols) {
     List<String> rightHandSide = new ArrayList<>();
     Collections.addAll(rightHandSide, rhsSymbols);
-    productions.add(new Production<>(lhs, rightHandSide));
+    productions.add(new Production<>(lhs, rightHandSide, productions.size() + 1));
   }
 
   public List<Production<String>> getProductions() {
