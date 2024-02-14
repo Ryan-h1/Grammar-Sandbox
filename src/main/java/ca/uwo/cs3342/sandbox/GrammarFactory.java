@@ -1,41 +1,32 @@
 package ca.uwo.cs3342.sandbox;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class GrammarFactory {
-  private LinkedHashMap<String, Symbol> symbolsMap = new LinkedHashMap<>();
-  private List<Production> productions = new ArrayList<>();
+public class GrammarFactory implements GrammarConstants {
+  private final LinkedHashMap<String, Symbol> symbolsMap = new LinkedHashMap<>();
+  private final List<Production<Symbol>> productions = new ArrayList<>();
 
-  // Method to simplify symbol creation
-  public Symbol createSymbol(String name, boolean isTerminal, boolean isEpsilon) {
-    Symbol symbol = new Symbol(name, isTerminal, isEpsilon);
-    symbolsMap.put(name, symbol);
-    return symbol;
+  GrammarFactory() {
+    symbolsMap.put(EPSILON, new Symbol(EPSILON, false, true));
   }
 
-  // Overloaded method for non-epsilon symbols
-  public Symbol createSymbol(String name, boolean isTerminal) {
-    return createSymbol(name, isTerminal, false);
-  }
-
-  // Method to simplify production creation
-  public void createProduction(String lhs, String... rhsSymbols) {
-    List<Symbol> rhs = new ArrayList<>();
-    for (String symbolName : rhsSymbols) {
-      rhs.add(symbolsMap.get(symbolName));
+  public Grammar createNewGrammar(GrammarForm grammarForm) {
+    for (Production<String> production : grammarForm.getProductions()) {
+      symbolsMap.put(production.leftHandSide, new Symbol(production.leftHandSide, false, false));
     }
-    productions.add(new Production(symbolsMap.get(lhs), rhs));
-  }
 
-  public LinkedHashMap<String, Symbol> getSymbolsMap() {
-    return symbolsMap;
-  }
+    for (Production<String> production : grammarForm.getProductions()) {
+      for (String symbolName : production.rightHandSide) {
+        symbolsMap.putIfAbsent(symbolName, new Symbol(symbolName, true, false));
+      }
 
-  public List<Symbol> getSymbols() {
-    return new ArrayList<>(symbolsMap.values());
-  }
+      productions.add(
+          new Production<>(
+              symbolsMap.get(production.leftHandSide),
+              production.rightHandSide.stream().map(symbolsMap::get).collect(Collectors.toList())));
+    }
 
-  public List<Production> getProductions() {
-    return productions;
+    return new Grammar(symbolsMap, productions);
   }
 }

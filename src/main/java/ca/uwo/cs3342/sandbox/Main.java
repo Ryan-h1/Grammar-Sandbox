@@ -1,50 +1,36 @@
 package ca.uwo.cs3342.sandbox;
 
-import java.util.*;
-
 public class Main {
   public static void main(String[] args) {
-    GrammarFactory factory = new GrammarFactory();
+    GrammarForm grammarForm = new GrammarForm();
 
-    // Non-terminal symbols
-    factory.createSymbol("program", false);
-    factory.createSymbol("exp", false);
-    factory.createSymbol("term_tail", false);
-    factory.createSymbol("term", false);
-    factory.createSymbol("factor_tail", false);
-    factory.createSymbol("factor", false);
-    factory.createSymbol("ε", false, true);
+    grammarForm.addProduction("program", "stmt_list", "$$");
+    grammarForm.addProduction("stmt_list", "stmt", "stmt_list");
+    grammarForm.addProduction("stmt_list", "ε");
+    grammarForm.addProduction("stmt", "id", ":=", "expr");
+    grammarForm.addProduction("stmt", "read", "id");
+    grammarForm.addProduction("stmt", "write", "expr");
+    grammarForm.addProduction("expr", "term", "term_tail");
+    grammarForm.addProduction("term_tail", "add_op", "term", "term_tail");
+    grammarForm.addProduction("term_tail", "ε");
+    grammarForm.addProduction("term", "factor", "factor_tail");
+    grammarForm.addProduction("factor_tail", "mult_op", "factor", "factor_tail");
+    grammarForm.addProduction("factor_tail", "ε");
+    grammarForm.addProduction("factor", "(", "expr", ")");
+    grammarForm.addProduction("factor", "id");
+    grammarForm.addProduction("factor", "number");
+    grammarForm.addProduction("add_op", "+");
+    grammarForm.addProduction("add_op", "-");
+    grammarForm.addProduction("mult_op", "*");
+    grammarForm.addProduction("mult_op", "/");
 
-    // Terminal symbols
-    factory.createSymbol("id", true);
-    factory.createSymbol("=", true);
-    factory.createSymbol("+", true);
-    factory.createSymbol("*", true);
-    factory.createSymbol("(", true);
-    factory.createSymbol(")", true);
-    factory.createSymbol("$$", true);
+    LLGrammar grammar = new LLGrammar(new GrammarFactory().createNewGrammar(grammarForm));
 
-    // Productions
-    factory.createProduction("program", "exp", "$$");
-    factory.createProduction("exp", "id", "=", "exp");
-    factory.createProduction("exp", "term", "term_tail");
-    factory.createProduction("term_tail", "+", "term", "term_tail");
-    factory.createProduction("term_tail", "ε");
-    factory.createProduction("term", "factor", "factor_tail");
-    factory.createProduction("factor_tail", "*", "factor", "factor_tail");
-    factory.createProduction("factor_tail", "ε");
-    factory.createProduction("factor", "(", "exp", ")");
-    factory.createProduction("factor", "id");
-
-    for (Production production : factory.getProductions()) {
-      System.out.println(production);
-    }
-
-    LLGrammar grammar = new LLGrammar(factory);
-
-    for (Symbol symbol : grammar.getSymbols()) {
-      System.out.println("FIRST(" + symbol.name + ")=" + symbol.firstSet.toString());
-//      System.out.println("FOLLOW(" + symbol.name + ")=" + symbol.followSet.toString());
-    }
+    System.out.println(grammar + "\n");
+    grammar.printFirstSets();
+    System.out.println();
+    grammar.printFollowSets();
+    System.out.println();
+    grammar.printPredictSets();
   }
 }
