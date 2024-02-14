@@ -27,7 +27,12 @@ public class LLParser {
 
     while (!stack.isEmpty()) {
       Symbol topStackSymbol = stack.peek();
+      if (!inputIterator.hasNext()) {
+        throw new RuntimeException("Unexpected end of input tokens.");
+      }
       Symbol currentInputSymbol = inputIterator.next();
+
+      ParseTreeNode.printParseTree(root);
 
       if (topStackSymbol.equals(grammar.getEpsilonSymbol())) {
         stack.pop();

@@ -46,7 +46,6 @@ public class Main {
     inputTokens.add(new Symbol("id"));
     inputTokens.add(new Symbol(":=")); // We have no predict set with this token???
     inputTokens.add(new Symbol("number"));
-    inputTokens.add(new Symbol("$$")); // (end of input symbol)
 
     ParseTreeNode.printParseTree(parser.parse(inputTokens));
   }
