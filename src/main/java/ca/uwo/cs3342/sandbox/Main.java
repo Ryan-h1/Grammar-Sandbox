@@ -43,12 +43,31 @@ public class Main {
 
     List<Symbol> inputTokens = new ArrayList<>();
 
+    // Corresponds to: read x
+    inputTokens.add(new Symbol("read"));
+    inputTokens.add(new Symbol("id"));
+
+    // Corresponds to: y := 5
     inputTokens.add(new Symbol("id"));
     inputTokens.add(new Symbol(":="));
     inputTokens.add(new Symbol("number"));
 
-    ParseTreeNode root = parser.parse(inputTokens);
+    // Corresponds to: z := x + (y * 10)
+    inputTokens.add(new Symbol("id"));
+    inputTokens.add(new Symbol(":="));
+    inputTokens.add(new Symbol("id"));
+    inputTokens.add(new Symbol("+"));
+    inputTokens.add(new Symbol("("));
+    inputTokens.add(new Symbol("id"));
+    inputTokens.add(new Symbol("*"));
+    inputTokens.add(new Symbol("number"));
+    inputTokens.add(new Symbol(")"));
 
+    // Corresponds to: write z
+    inputTokens.add(new Symbol("write"));
+    inputTokens.add(new Symbol("id"));
+
+    ParseTreeNode root = parser.parse(inputTokens);
     ParseTreeVisualizer.visualize(root);
     ParseTreeVisualizer.printParseTree(root);
   }

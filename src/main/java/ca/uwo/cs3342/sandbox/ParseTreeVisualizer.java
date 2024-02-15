@@ -2,6 +2,8 @@ package ca.uwo.cs3342.sandbox;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -13,6 +15,7 @@ public class ParseTreeVisualizer extends JPanel {
   private static final int NODE_GAP = 10;
   private final ParseTreeNode root;
   private final Map<ParseTreeNode, Integer> subtreeWidths;
+  private double zoomFactor = 1.0;
 
   /***
    * @param root The root of the parse tree to visualize
@@ -27,6 +30,17 @@ public class ParseTreeVisualizer extends JPanel {
     frame.getContentPane().add(this);
     frame.pack();
     frame.setVisible(true);
+
+    addMouseWheelListener(
+        e -> {
+          if (e.getPreciseWheelRotation() < 0) {
+            zoomFactor *= 1.1; // Zoom in
+          } else {
+            zoomFactor /= 1.1; // Zoom out
+          }
+          revalidate();
+          repaint();
+        });
   }
 
   private int calculateSubtreeWidths(ParseTreeNode node) {
@@ -76,14 +90,6 @@ public class ParseTreeVisualizer extends JPanel {
     SwingUtilities.invokeLater(() -> new ParseTreeVisualizer(root));
   }
 
-  @Override
-  protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    int startingX = getWidth() / 2; // Center of the component
-    int startingY = NODE_HEIGHT / 2; // A little offset from the top
-    drawTree(g, root, startingX, startingY, getWidth());
-  }
-
   /**
    * @param root The root of the parse tree to print
    */
@@ -121,5 +127,17 @@ public class ParseTreeVisualizer extends JPanel {
       }
       System.out.println();
     }
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    Graphics2D g2 = (Graphics2D) g;
+    g2.scale(zoomFactor, zoomFactor); // Apply zoom factor
+    int startingX =
+        (int) ((getWidth() / 2) / zoomFactor); // Center of the component adjusted for zoom
+    int startingY =
+        (int) ((NODE_HEIGHT / 2) / zoomFactor); // A little offset from the top adjusted for zoom
+    drawTree(g2, root, startingX, startingY, getWidth());
   }
 }
