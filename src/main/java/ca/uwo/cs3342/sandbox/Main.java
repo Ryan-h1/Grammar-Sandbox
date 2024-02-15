@@ -7,17 +7,25 @@ public class Main {
   public static void main(String[] args) {
     GrammarForm grammarForm = new GrammarForm();
 
-    // Add productions based on the grammar rules from the image
-    grammarForm.addProduction("program", "exp", "$$");
-    grammarForm.addProduction("exp", "id", "=", "exp");
-    grammarForm.addProduction("exp", "term", "term_tail");
-    grammarForm.addProduction("term_tail", "+", "term", "term_tail");
-    grammarForm.addProduction("term_tail", "ε"); // ε represents an empty string or null production
+    grammarForm.addProduction("program", "stmt_list", "$$");
+    grammarForm.addProduction("stmt_list", "stmt", "stmt_list");
+    grammarForm.addProduction("stmt_list", "ε");
+    grammarForm.addProduction("stmt", "id", ":=", "expr");
+    grammarForm.addProduction("stmt", "read", "id");
+    grammarForm.addProduction("stmt", "write", "expr");
+    grammarForm.addProduction("expr", "term", "term_tail");
+    grammarForm.addProduction("term_tail", "add_op", "term", "term_tail");
+    grammarForm.addProduction("term_tail", "ε");
     grammarForm.addProduction("term", "factor", "factor_tail");
-    grammarForm.addProduction("factor_tail", "*", "factor", "factor_tail");
-    grammarForm.addProduction("factor_tail", "ε"); // ε represents an empty string or null production
-    grammarForm.addProduction("factor", "(", "exp", ")");
+    grammarForm.addProduction("factor_tail", "mult_op", "factor", "factor_tail");
+    grammarForm.addProduction("factor_tail", "ε");
+    grammarForm.addProduction("factor", "(", "expr", ")");
     grammarForm.addProduction("factor", "id");
+    grammarForm.addProduction("factor", "number");
+    grammarForm.addProduction("add_op", "+");
+    grammarForm.addProduction("add_op", "-");
+    grammarForm.addProduction("mult_op", "*");
+    grammarForm.addProduction("mult_op", "/");
 
     LLGrammar grammar = new LLGrammar(new GrammarFactory().createNewGrammar(grammarForm));
 
@@ -36,19 +44,12 @@ public class Main {
     List<Symbol> inputTokens = new ArrayList<>();
 
     inputTokens.add(new Symbol("id"));
-    inputTokens.add(new Symbol("="));
-    inputTokens.add(new Symbol("id"));
-    inputTokens.add(new Symbol("*"));
-    inputTokens.add(new Symbol("("));
-    inputTokens.add(new Symbol("id"));
-    inputTokens.add(new Symbol("="));
-    inputTokens.add(new Symbol("id"));
-    inputTokens.add(new Symbol("+"));
-    inputTokens.add(new Symbol("id"));
-    inputTokens.add(new Symbol("*"));
-    inputTokens.add(new Symbol("id"));
-    inputTokens.add(new Symbol(")"));
+    inputTokens.add(new Symbol(":="));
+    inputTokens.add(new Symbol("number"));
 
-    ParseTreeNode.printParseTree(parser.parse(inputTokens));
+    ParseTreeNode root = parser.parse(inputTokens);
+
+    ParseTreeVisualizer.visualize(root);
+    ParseTreeNode.printParseTree(root);
   }
 }

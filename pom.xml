@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ca.uwo.cs2212.group2</groupId>
+    <groupId>ca.uwo.cs3342.sandbox</groupId>
     <artifactId>cs3342_assignment_II</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -13,5 +13,13 @@
         <maven.compiler.target>19</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <developers>
+        <developer>
+            <id>Ryan-h1</id>
+            <name>Ryan Hecht</name>
+            <email>ryanhecht.dev@gmail.com</email>
+        </developer>
+    </developers>
 
 </project>
