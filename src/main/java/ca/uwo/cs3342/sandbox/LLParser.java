@@ -15,8 +15,8 @@ public class LLParser {
   }
 
   public ParseTreeNode parse(List<Symbol> inputTokens) throws RuntimeException {
-    Stack<Symbol> stack = new Stack<>();
-    Stack<ParseTreeNode> parseTreeStack = new Stack<>();
+    Deque<Symbol> stack = new ArrayDeque<>();
+    Deque<ParseTreeNode> parseTreeStack = new ArrayDeque<>();
     stack.push(grammar.getEndOfInputSymbol());
     stack.push(grammar.getStartSymbol());
     inputTokens.add(grammar.getEndOfInputSymbol());
@@ -57,15 +57,23 @@ public class LLParser {
           List<Symbol> rhs = production.getRightHandSide();
           if (rhs.isEmpty() || (rhs.size() == 1 && rhs.get(0).equals(grammar.getEpsilonSymbol()))) {
             // Handle epsilon production by not pushing anything onto the stack
-            node.addChild(
-                new ParseTreeNode(grammar.getEpsilonSymbol())); // Optionally add epsilon node
+            node.addChild(new ParseTreeNode(grammar.getEpsilonSymbol())); // Add epsilon node
           } else {
-            // Push production symbols in reverse order to stack
-            for (int i = rhs.size() - 1; i >= 0; i--) {
-              Symbol symbol = rhs.get(i);
-              ParseTreeNode childNode = new ParseTreeNode(symbol);
+            // Create child nodes for all symbols in the production rule
+            List<ParseTreeNode> childNodes = new ArrayList<>();
+            for (Symbol symbol : rhs) {
+              childNodes.add(new ParseTreeNode(symbol));
+            }
+
+            // Add child nodes to the current node in the order they appear
+            for (ParseTreeNode childNode : childNodes) {
               node.addChild(childNode);
-              stack.push(symbol);
+            }
+
+            // Push symbols onto the stack in reverse order for correct processing
+            for (int i = childNodes.size() - 1; i >= 0; i--) {
+              ParseTreeNode childNode = childNodes.get(i);
+              stack.push(childNode.getSymbol());
               parseTreeStack.push(childNode);
             }
           }
@@ -84,31 +92,7 @@ public class LLParser {
   }
 
   public void printParseTable() {
-    // Determine the width for each column for formatting
-    int startColumnWidth = 15;
-    int columnWidth = 8;
-
-    // Print the header row with input symbols
-    System.out.print(String.format("%-" + startColumnWidth + "s", "State"));
-    grammar
-        .getTerminals()
-        .forEach(terminal -> System.out.print(String.format("%-" + columnWidth + "s", terminal)));
-    System.out.println();
-
-    // Print each row of the parse table
-    parseTable.forEach(
-        (nonTerminal, row) -> {
-          System.out.print(String.format("%-" + startColumnWidth + "s", nonTerminal));
-          grammar
-              .getTerminals()
-              .forEach(
-                  terminal -> {
-                    Production<Symbol> production = row.get(terminal);
-                    String output = production != null ? "P" + production.getId() : "-";
-                    System.out.print(String.format("%-" + columnWidth + "s", output));
-                  });
-          System.out.println(); // New line after each row
-        });
+    ParseTableVisualizer.visualize(grammar, parseTable);
   }
 
   private void constructParseTable() {

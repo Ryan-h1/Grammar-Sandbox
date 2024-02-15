@@ -50,6 +50,6 @@ public class Main {
     ParseTreeNode root = parser.parse(inputTokens);
 
     ParseTreeVisualizer.visualize(root);
-    ParseTreeNode.printParseTree(root);
+    ParseTreeVisualizer.printParseTree(root);
   }
 }
