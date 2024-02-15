@@ -15,67 +15,71 @@ public class LLParser {
   }
 
   public ParseTreeNode parse(List<Symbol> inputTokens) throws RuntimeException {
-    Deque<Symbol> stack = new ArrayDeque<>();
+    Stack<Symbol> stack = new Stack<>();
+    Stack<ParseTreeNode> parseTreeStack = new Stack<>();
     stack.push(grammar.getEndOfInputSymbol());
     stack.push(grammar.getStartSymbol());
+    inputTokens.add(grammar.getEndOfInputSymbol());
 
-    ListIterator<Symbol> inputIterator = inputTokens.listIterator();
-    ParseTreeNode root =
-        new ParseTreeNode(grammar.getStartSymbol()); // Starting point of the parse tree
-    Stack<ParseTreeNode> nodeStack = new Stack<>();
-    nodeStack.push(root);
+    ParseTreeNode root = new ParseTreeNode(grammar.getStartSymbol());
+    parseTreeStack.push(root);
+
+    int tokenIndex = 0;
 
     while (!stack.isEmpty()) {
-      Symbol topStackSymbol = stack.peek();
-      if (!inputIterator.hasNext()) {
-        throw new RuntimeException("Unexpected end of input tokens.");
+      Symbol topSymbol = stack.peek();
+
+      // If the top of the stack is the end of input symbol and it matches the current token,
+      // parsing is done
+      if (topSymbol.equals(grammar.getEndOfInputSymbol())
+          && topSymbol.equals(inputTokens.get(tokenIndex))) {
+        break; // Successfully reached the end of input
       }
-      Symbol currentInputSymbol = inputIterator.next();
 
-      ParseTreeNode.printParseTree(root);
+      Symbol currentToken = inputTokens.get(tokenIndex);
 
-      if (topStackSymbol.equals(grammar.getEpsilonSymbol())) {
-        stack.pop();
-        nodeStack.pop();
-        inputIterator.previous(); // Unread the current input symbol
-      } else if (topStackSymbol.isTerminal
-          || topStackSymbol.equals(grammar.getEndOfInputSymbol())) {
-        if (topStackSymbol.equals(currentInputSymbol)) {
-          stack.pop(); // Matched a terminal, pop from the stack
-          nodeStack.pop().setSymbol(currentInputSymbol); // Attach token to the tree node
+      if (grammar.getTerminals().contains(topSymbol)
+          || topSymbol.equals(grammar.getEndOfInputSymbol())) {
+        if (topSymbol.equals(currentToken)) {
+          stack.pop(); // Match, move forward in input
+          parseTreeStack.pop(); // Pop from parse tree stack as well
+          tokenIndex++;
         } else {
-          // Handle parsing error - terminal mismatch
-          throw new RuntimeException(
-              "Syntax error: expected " + topStackSymbol + ", found " + currentInputSymbol);
+          throw new RuntimeException("Syntax Error: Unexpected symbol " + currentToken);
         }
-      } else {
-        Map<Symbol, Production<Symbol>> row = parseTable.get(topStackSymbol);
-        Production<Symbol> production = row.get(currentInputSymbol);
+      } else { // Non-terminal
+        Map<Symbol, Production<Symbol>> row = parseTable.get(topSymbol);
+        if (row != null && row.containsKey(currentToken)) {
+          Production<Symbol> production = row.get(currentToken);
+          stack.pop(); // Pop the non-terminal
+          ParseTreeNode node = parseTreeStack.pop();
 
-        if (production != null) {
-          stack.pop(); // Pop the non-terminal from the stack
-          ParseTreeNode parentNode = nodeStack.pop();
-
-          // Reverse the RHS of the production to push onto the stack
-          List<Symbol> productionRHS = new ArrayList<>(production.rightHandSide);
-          Collections.reverse(productionRHS);
-
-          for (Symbol symbol : productionRHS) {
-            stack.push(symbol);
-            ParseTreeNode childNode = new ParseTreeNode(symbol);
-            parentNode.addChild(childNode);
-            nodeStack.push(childNode);
+          List<Symbol> rhs = production.getRightHandSide();
+          if (rhs.isEmpty() || (rhs.size() == 1 && rhs.get(0).equals(grammar.getEpsilonSymbol()))) {
+            // Handle epsilon production by not pushing anything onto the stack
+            node.addChild(
+                new ParseTreeNode(grammar.getEpsilonSymbol())); // Optionally add epsilon node
+          } else {
+            // Push production symbols in reverse order to stack
+            for (int i = rhs.size() - 1; i >= 0; i--) {
+              Symbol symbol = rhs.get(i);
+              ParseTreeNode childNode = new ParseTreeNode(symbol);
+              node.addChild(childNode);
+              stack.push(symbol);
+              parseTreeStack.push(childNode);
+            }
           }
         } else {
-          // Handle parsing error - no production found
           throw new RuntimeException(
-              "Syntax error: no rule to apply for "
-                  + topStackSymbol
-                  + " with input "
-                  + currentInputSymbol);
+              "Syntax Error: No rule to apply for " + topSymbol + " with token " + currentToken);
         }
       }
     }
+
+    if (tokenIndex < inputTokens.size() - 1) { // Ensure parsing consumed all input
+      throw new RuntimeException("Syntax Error: Extra input tokens");
+    }
+
     return root; // Return the root of the parse tree
   }
 
@@ -108,30 +112,13 @@ public class LLParser {
   }
 
   private void constructParseTable() {
-    // For each production A -> α in G
     for (Production<Symbol> production : grammar.getProductions()) {
-      Symbol A = production.leftHandSide;
-      LinkedHashSet<Symbol> predictSet = production.predictSet;
-
-      // For each terminal a in PREDICT(A -> α)
-      for (Symbol a : predictSet) {
-        // If ε is in PREDICT(A -> α), add A -> α to M[A, b] for each b in FOLLOW(A)
-        if (a.isEpsilon) {
-          for (Symbol b : A.followSet) {
-            addToParsingTable(A, b, production);
-          }
-        } else {
-          // Otherwise, add A -> α to M[A, a]
-          addToParsingTable(A, a, production);
+      for (Symbol terminal : grammar.getTerminals()) {
+        if (production.predictSet.contains(terminal)) {
+          parseTable.putIfAbsent(production.leftHandSide, new HashMap<>());
+          parseTable.get(production.leftHandSide).put(terminal, production);
         }
       }
     }
-  }
-
-  private void addToParsingTable(
-      Symbol nonTerminal, Symbol terminal, Production<Symbol> production) {
-    Map<Symbol, Production<Symbol>> row =
-        parseTable.computeIfAbsent(nonTerminal, k -> new HashMap<>());
-    row.put(terminal, production);
   }
 }
