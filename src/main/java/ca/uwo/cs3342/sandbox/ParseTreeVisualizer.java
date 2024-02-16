@@ -73,6 +73,11 @@ public class ParseTreeVisualizer extends JPanel {
     g.fillRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
     g.setColor(Color.BLACK);
     g.drawRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
+    if (node.getSymbol().isTerminal()) {
+      g.setFont(g.getFont().deriveFont(Font.BOLD));
+    } else {
+      g.setFont(g.getFont().deriveFont(Font.ITALIC));
+    }
     drawCenteredString(g, node.getSymbol().toString(), x, y);
   }
 

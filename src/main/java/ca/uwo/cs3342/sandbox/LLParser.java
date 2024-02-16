@@ -34,6 +34,10 @@ public class LLParser {
     int tokenIndex = 0;
 
     while (!stack.isEmpty()) {
+      if (EnvironmentConstants.DEBUG) {
+        ParseTreeVisualizer.printParseTree(root);
+      }
+
       Symbol topSymbol = stack.peek();
 
       // If the top of the stack is the end of input symbol and it matches the current token,
