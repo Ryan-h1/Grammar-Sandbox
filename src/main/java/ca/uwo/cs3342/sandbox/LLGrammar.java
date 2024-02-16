@@ -60,8 +60,6 @@ public class LLGrammar extends Grammar implements GrammarConstants {
   }
 
   private void calculateFollowSets() {
-    this.getSymbols().get(1).followSet.add(this.symbolsMap.get(END_OF_INPUT));
-
     boolean progress;
     do {
       progress = false;
@@ -69,7 +67,7 @@ public class LLGrammar extends Grammar implements GrammarConstants {
         List<Symbol> rhs = p.rightHandSide;
         for (int i = 0; i < rhs.size(); i++) {
           Symbol B = rhs.get(i);
-          if (!B.isTerminal) {
+          if (!B.isTerminal() && !B.isEpsilon()) {
             LinkedHashSet<Symbol> followB = B.followSet;
             int originalSize = followB.size();
 
