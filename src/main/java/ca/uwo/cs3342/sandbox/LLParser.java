@@ -14,6 +14,13 @@ public class LLParser {
     constructParseTable();
   }
 
+  /***
+   * Parses the input tokens using the LL(1) parse table
+   *
+   * @param inputTokens List of input tokens
+   * @return Parse tree root node
+   * @throws RuntimeException if the input tokens do not form a valid parse tree
+   */
   public ParseTreeNode parse(List<Symbol> inputTokens) throws RuntimeException {
     Deque<Symbol> stack = new ArrayDeque<>();
     Deque<ParseTreeNode> parseTreeStack = new ArrayDeque<>();
@@ -91,6 +98,9 @@ public class LLParser {
     return root; // Return the root of the parse tree
   }
 
+  /***
+   * Prints the LL(1) parse table
+   */
   public void printParseTable() {
     ParseTableVisualizer.visualize(grammar, parseTable);
   }
