@@ -26,6 +26,14 @@ public class LLParser {
       throw new RuntimeException("End of input symbol not set");
     }
 
+    if (inputTokens.get(inputTokens.size() - 1) == grammar.getEndOfInputSymbol()) {
+      inputTokens.remove(inputTokens.size() - 1);
+      if (EnvironmentConstants.DEBUG) {
+        System.out.println(
+            "The end of input symbol was already present in the input tokens and was removed");
+      }
+    }
+
     Deque<Symbol> stack = new ArrayDeque<>();
     Deque<ParseTreeNode> parseTreeStack = new ArrayDeque<>();
     stack.push(grammar.getEndOfInputSymbol());

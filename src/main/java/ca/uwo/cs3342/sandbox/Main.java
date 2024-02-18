@@ -7,23 +7,21 @@ public class Main {
   public static void main(String[] args) {
     GrammarForm grammarForm = new GrammarForm();
 
-    grammarForm.addProduction("S", "switch", "(", "E", ")", "{", "C", "}", "$$");
-    grammarForm.addProduction("C", "K", "L");
-    grammarForm.addProduction("L", "K", "L");
-    grammarForm.addProduction("L", "ε");
-    grammarForm.addProduction("K", "case", "E", ":", "S");
-    grammarForm.addProduction("S", "stmt");
-    grammarForm.addProduction("S", "ε");
-    grammarForm.addProduction("E", "expr");
+    grammarForm.addProduction("program", "exp", "$$");
+    grammarForm.addProduction("exp", "id", "=", "exp");
+    grammarForm.addProduction("exp", "term", "term_tail");
+    grammarForm.addProduction("term_tail", "+", "term", "term_tail");
+    grammarForm.addProduction("term_tail", "ε");
+    grammarForm.addProduction("term", "factor", "factor_tail");
+    grammarForm.addProduction("factor_tail", "*", "factor", "factor_tail");
+    grammarForm.addProduction("factor_tail", "ε");
+    grammarForm.addProduction("factor", "(", "exp", ")");
+    grammarForm.addProduction("factor", "id");
 
     LLGrammar grammar = new LLGrammar(new GrammarFactory().createNewGrammar(grammarForm));
 
     System.out.println(grammar + "\n");
-    grammar.printFirstSets();
-    System.out.println();
-    grammar.printFollowSets();
-    System.out.println();
-    grammar.printPredictSets();
+    grammar.printAllSets();
 
     LLParser parser = new LLParser(grammar);
 
@@ -33,16 +31,7 @@ public class Main {
     List<Symbol> inputTokens = new ArrayList<>();
 
     String[] input =
-        new String[] {
-          "switch", "(", "expr", ")", "{",
-          "case", "expr", ":",
-          "case", "expr", ":", "stmt",
-          "case", "expr", ":", "stmt",
-          "case", "expr", ":",
-          "case", "expr", ":",
-          "case", "expr", ":", "stmt",
-          "}"
-        };
+        new String[] {"id", "=", "id", "*", "(", "id", "=", "id", "+", "id", "*", "id", ")"};
 
     for (String token : input) {
       inputTokens.add(new Symbol(token));
