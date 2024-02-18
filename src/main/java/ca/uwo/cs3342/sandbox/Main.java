@@ -7,17 +7,14 @@ public class Main {
   public static void main(String[] args) {
     GrammarForm grammarForm = new GrammarForm();
 
-    grammarForm.addProduction("program", "exp", "$$");
-    grammarForm.addProduction("exp", "term", "exp_tail");
-    grammarForm.addProduction("exp_tail", "=", "exp");
-    grammarForm.addProduction("exp_tail", "term_tail");
-    grammarForm.addProduction("term_tail", "+", "term", "term_tail");
-    grammarForm.addProduction("term_tail", "ε");
-    grammarForm.addProduction("term", "factor", "factor_tail");
-    grammarForm.addProduction("factor_tail", "*", "factor", "factor_tail");
-    grammarForm.addProduction("factor_tail", "ε");
-    grammarForm.addProduction("factor", "(", "exp", ")");
-    grammarForm.addProduction("factor", "id");
+    grammarForm.addProduction("S", "switch", "(", "E", ")", "{", "C", "}", "$$");
+    grammarForm.addProduction("C", "K", "L");
+    grammarForm.addProduction("L", "K", "L");
+    grammarForm.addProduction("L", "ε");
+    grammarForm.addProduction("K", "case", "E", ":", "S");
+    grammarForm.addProduction("S", "stmt");
+    grammarForm.addProduction("S", "ε");
+    grammarForm.addProduction("E", "expr");
 
     LLGrammar grammar = new LLGrammar(new GrammarFactory().createNewGrammar(grammarForm));
 
@@ -36,7 +33,16 @@ public class Main {
     List<Symbol> inputTokens = new ArrayList<>();
 
     String[] input =
-        new String[] {"id", "=", "id", "*", "(", "id", "=", "id", "+", "id", "*", "id", ")"};
+        new String[] {
+          "switch", "(", "expr", ")", "{",
+          "case", "expr", ":",
+          "case", "expr", ":", "stmt",
+          "case", "expr", ":", "stmt",
+          "case", "expr", ":",
+          "case", "expr", ":",
+          "case", "expr", ":", "stmt",
+          "}"
+        };
 
     for (String token : input) {
       inputTokens.add(new Symbol(token));

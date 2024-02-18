@@ -20,7 +20,7 @@ public class ParseTableVisualizer {
     int columnWidth = 8;
 
     // Print the header row with input symbols
-    System.out.print(String.format("%-" + startColumnWidth + "s", "State"));
+    System.out.print(String.format("%-" + startColumnWidth + "s", "Nonterminal"));
     grammar
         .getTerminals()
         .forEach(terminal -> System.out.print(String.format("%-" + columnWidth + "s", terminal)));

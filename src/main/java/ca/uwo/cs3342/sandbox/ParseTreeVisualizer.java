@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.List;
 
 public class ParseTreeVisualizer extends JPanel {
-  private static final int NODE_WIDTH = 80;
-  private static final int NODE_HEIGHT = 40;
-  private static final int LEVEL_GAP = 80;
-  private static final int NODE_GAP = 10;
+  private static final int NODE_WIDTH = 60;
+  private static final int NODE_HEIGHT = 30;
+  private static final int LEVEL_GAP = 140;
+  private static final int NODE_GAP = 16;
   private final ParseTreeNode root;
   private final Map<ParseTreeNode, Integer> subtreeWidths;
   private double zoomFactor = 1.0;
@@ -24,12 +24,26 @@ public class ParseTreeVisualizer extends JPanel {
     this.root = root;
     this.subtreeWidths = new HashMap<>();
     calculateSubtreeWidths(root);
-    setPreferredSize(new Dimension((int) (subtreeWidths.get(root) * 1.2), 800));
+
+    setPreferredSize(new Dimension((int) (subtreeWidths.get(root)), 800));
+    JScrollPane scrollPane = new JScrollPane(this);
+    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+
     JFrame frame = new JFrame("Parse Tree Visualization");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.getContentPane().add(this);
+    frame.getContentPane().add(scrollPane);
     frame.pack();
     frame.setVisible(true);
+
+    // Center the horizontal scrollbar
+    SwingUtilities.invokeLater(() -> {
+      JScrollBar hBar = scrollPane.getHorizontalScrollBar();
+      int scrollBarMax = hBar.getMaximum();
+      int scrollBarWidth = hBar.getWidth();
+      int scrollBarValue = (scrollBarMax - scrollBarWidth) / 2;
+      hBar.setValue(scrollBarValue);
+    });
 
     addMouseWheelListener(
         e -> {

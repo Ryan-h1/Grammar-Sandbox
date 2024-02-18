@@ -22,6 +22,10 @@ public class LLParser {
    * @throws RuntimeException if the input tokens do not form a valid parse tree
    */
   public ParseTreeNode parse(List<Symbol> inputTokens) throws RuntimeException {
+    if (grammar.getEndOfInputSymbol() == null) {
+      throw new RuntimeException("End of input symbol not set");
+    }
+
     Deque<Symbol> stack = new ArrayDeque<>();
     Deque<ParseTreeNode> parseTreeStack = new ArrayDeque<>();
     stack.push(grammar.getEndOfInputSymbol());
@@ -56,7 +60,11 @@ public class LLParser {
           parseTreeStack.pop(); // Pop from parse tree stack as well
           tokenIndex++;
         } else {
-          throw new RuntimeException("Syntax Error: Unexpected symbol " + currentToken);
+          throw new RuntimeException(
+              "Syntax Error: Unexpected symbol "
+                  + currentToken
+                  + " with current top symbol "
+                  + topSymbol);
         }
       } else { // Non-terminal
         Map<Symbol, Production<Symbol>> row = parseTable.get(topSymbol);
