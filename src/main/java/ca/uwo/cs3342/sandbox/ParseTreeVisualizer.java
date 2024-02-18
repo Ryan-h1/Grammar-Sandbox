@@ -11,8 +11,8 @@ import java.util.List;
 public class ParseTreeVisualizer extends JPanel {
   private static final int NODE_WIDTH = 60;
   private static final int NODE_HEIGHT = 30;
-  private static final int LEVEL_GAP = 140;
-  private static final int NODE_GAP = 16;
+  private static final int LEVEL_GAP = 80;
+  private static final int NODE_GAP = 10;
   private final ParseTreeNode root;
   private final Map<ParseTreeNode, Integer> subtreeWidths;
   private double zoomFactor = 1.0;

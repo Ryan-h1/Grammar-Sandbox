@@ -8,8 +8,9 @@ public class Main {
     GrammarForm grammarForm = new GrammarForm();
 
     grammarForm.addProduction("program", "exp", "$$");
-    grammarForm.addProduction("exp", "id", "=", "exp");
-    grammarForm.addProduction("exp", "term", "term_tail");
+    grammarForm.addProduction("exp", "term", "exp_tail");
+    grammarForm.addProduction("exp_tail", "=", "exp");
+    grammarForm.addProduction("exp_tail", "term_tail");
     grammarForm.addProduction("term_tail", "+", "term", "term_tail");
     grammarForm.addProduction("term_tail", "ε");
     grammarForm.addProduction("term", "factor", "factor_tail");
@@ -18,12 +19,12 @@ public class Main {
     grammarForm.addProduction("factor", "(", "exp", ")");
     grammarForm.addProduction("factor", "id");
 
-    LLGrammar grammar = new LLGrammar(new GrammarFactory().createNewGrammar(grammarForm));
-
+    Grammar grammar = new GrammarFactory().createNewGrammar(grammarForm);
     System.out.println(grammar + "\n");
     grammar.printAllSets();
 
-    LLParser parser = new LLParser(grammar);
+    LLGrammar topDownGrammar = new LLGrammar(grammar);
+    LLParser parser = new LLParser(topDownGrammar);
 
     System.out.println();
     parser.printParseTable();
