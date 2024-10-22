@@ -5,6 +5,32 @@ import java.util.List;
 
 public class Main {
   public static void main(String[] args) {
+    runProgram(getGrammarForm1(), getInput1());
+  }
+
+  private static void runProgram(GrammarForm grammarForm, String[] input) {
+    Grammar grammar = new GrammarFactory().createNewGrammar(grammarForm);
+    System.out.println(grammar + "\n");
+    grammar.printAllSets();
+
+    LLGrammar topDownGrammar = new LLGrammar(grammar);
+    LLParser parser = new LLParser(topDownGrammar);
+
+    System.out.println();
+    parser.printParseTable();
+
+    List<Symbol> inputTokens = new ArrayList<>();
+
+    for (String token : input) {
+      inputTokens.add(new Symbol(token));
+    }
+
+    ParseTreeNode root = parser.parse(inputTokens);
+    ParseTreeVisualizer.visualize(root);
+    ParseTreeVisualizer.printParseTree(root);
+  }
+
+  private static GrammarForm getGrammarForm1() {
     GrammarForm grammarForm = new GrammarForm();
 
     grammarForm.addProduction("program", "exp", "$$");
@@ -18,28 +44,22 @@ public class Main {
     grammarForm.addProduction("factor_tail", "ε");
     grammarForm.addProduction("factor", "(", "exp", ")");
     grammarForm.addProduction("factor", "id");
+    return grammarForm;
+  }
 
-    Grammar grammar = new GrammarFactory().createNewGrammar(grammarForm);
-    System.out.println(grammar + "\n");
-    grammar.printAllSets();
+  private static GrammarForm getGrammarForm2() {
+    GrammarForm grammarForm = new GrammarForm();
 
-    LLGrammar topDownGrammar = new LLGrammar(grammar);
-    LLParser parser = new LLParser(topDownGrammar);
+    grammarForm.addProduction("P", "A", "$$");
+    grammarForm.addProduction("A", "a", "b");
+    return grammarForm;
+  }
 
-    System.out.println();
-    parser.printParseTable();
+  private static String[] getInput1() {
+    return new String[] {"id", "=", "id", "*", "(", "id", "=", "id", "+", "id", "*", "id", ")"};
+  }
 
-    List<Symbol> inputTokens = new ArrayList<>();
-
-    String[] input =
-        new String[] {"id", "=", "id", "*", "(", "id", "=", "id", "+", "id", "*", "id", ")"};
-
-    for (String token : input) {
-      inputTokens.add(new Symbol(token));
-    }
-
-    ParseTreeNode root = parser.parse(inputTokens);
-    ParseTreeVisualizer.visualize(root);
-    ParseTreeVisualizer.printParseTree(root);
+  private static String[] getInput2() {
+    return "a b".split("\\s+");
   }
 }
