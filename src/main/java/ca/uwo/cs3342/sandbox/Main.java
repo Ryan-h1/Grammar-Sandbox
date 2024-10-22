@@ -5,11 +5,12 @@ import java.util.List;
 
 public class Main {
   public static void main(String[] args) {
-    runProgram(getGrammarForm1(), getInput1());
+    runProgram(getGrammarForm5(), getInput1());
   }
 
   private static void runProgram(GrammarForm grammarForm, String[] input) {
     Grammar grammar = new GrammarFactory().createNewGrammar(grammarForm);
+    System.out.println(grammar.getTerminals() + "\n");
     System.out.println(grammar + "\n");
     grammar.printAllSets();
 
@@ -52,6 +53,54 @@ public class Main {
 
     grammarForm.addProduction("P", "A", "$$");
     grammarForm.addProduction("A", "a", "b");
+    return grammarForm;
+  }
+
+  private static GrammarForm getGrammarForm3() {
+    GrammarForm grammarForm = new GrammarForm();
+
+    grammarForm.addProduction("P", "S");
+    grammarForm.addProduction("S", "A", "C");
+    grammarForm.addProduction("A", "a", "A", "b");
+    grammarForm.addProduction("A", "ε");
+    grammarForm.addProduction("C", "C", "c");
+    grammarForm.addProduction("C", "ε");
+    return grammarForm;
+  }
+
+  private static GrammarForm getGrammarForm4() {
+    GrammarForm grammarForm = new GrammarForm();
+
+    grammarForm.addProduction("S", "Expr", "$$");
+    grammarForm.addProduction("Expr", "UnionExpr");
+    grammarForm.addProduction("UnionExpr", "UnionExpr", "∪", "IntExpr");
+    grammarForm.addProduction("UnionExpr", "IntExpr");
+    grammarForm.addProduction("IntExpr", "IntExpr", "∩", "NegExpr");
+    grammarForm.addProduction("IntExpr", "NegExpr");
+    grammarForm.addProduction("NegExpr", "¬", "NegExpr");
+    grammarForm.addProduction("NegExpr", "Base");
+    grammarForm.addProduction("Base", "(", "Expr", ")");
+    grammarForm.addProduction("Base", "id");
+
+    return grammarForm;
+  }
+
+  private static GrammarForm getGrammarForm5() {
+    GrammarForm grammarForm = new GrammarForm();
+
+    grammarForm.addProduction("P", "E", "$$");
+    grammarForm.addProduction("E", "(", "E", ")");
+    grammarForm.addProduction("E", "V");
+    grammarForm.addProduction("E", "S");  // Corrected this from epsilon to S
+    grammarForm.addProduction("V", "E", "∪", "E");
+    grammarForm.addProduction("V", "I");
+    grammarForm.addProduction("I", "E", "∩", "E");
+    grammarForm.addProduction("I", "N");
+    grammarForm.addProduction("N", "-", "E");
+    grammarForm.addProduction("N", "ε");  // Added epsilon (empty) production
+    grammarForm.addProduction("S", "{", "a", ",", "b", ",", "...", ",", "z", ",", "∅", ",", "U", "}");
+    grammarForm.addProduction("S", "ε");  // Added epsilon (empty) production
+
     return grammarForm;
   }
 
