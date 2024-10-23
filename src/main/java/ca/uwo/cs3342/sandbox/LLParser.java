@@ -54,6 +54,7 @@ public class LLParser {
 
       // If the top of the stack is the end of input symbol and it matches the current token,
       // parsing is done
+      assert topSymbol != null;
       if (topSymbol.equals(grammar.getEndOfInputSymbol())
           && topSymbol.equals(inputTokens.get(tokenIndex))) {
         break; // Successfully reached the end of input

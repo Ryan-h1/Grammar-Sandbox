@@ -23,9 +23,9 @@ public class ParseTreeVisualizer extends JPanel {
   public ParseTreeVisualizer(ParseTreeNode root) {
     this.root = root;
     this.subtreeWidths = new HashMap<>();
-    calculateSubtreeWidths(root);
+    calculateSubtreeWidths(root, subtreeWidths);
 
-    setPreferredSize(new Dimension((int) (subtreeWidths.get(root)), 800));
+    setPreferredSize(new Dimension(subtreeWidths.get(root), 800));
     JScrollPane scrollPane = new JScrollPane(this);
     scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -57,10 +57,10 @@ public class ParseTreeVisualizer extends JPanel {
         });
   }
 
-  private int calculateSubtreeWidths(ParseTreeNode node) {
+  private int calculateSubtreeWidths(ParseTreeNode node, Map<ParseTreeNode, Integer> subtreeWidths) {
     int width = NODE_GAP;
     for (ParseTreeNode child : node.getChildren()) {
-      width += calculateSubtreeWidths(child) + NODE_GAP; // Gap between nodes
+      width += calculateSubtreeWidths(child, subtreeWidths) + NODE_GAP; // Gap between nodes
     }
     width = Math.max(width, NODE_WIDTH); // Ensure minimum width for the node itself
     subtreeWidths.put(node, width);
@@ -154,9 +154,9 @@ public class ParseTreeVisualizer extends JPanel {
     Graphics2D g2 = (Graphics2D) g;
     g2.scale(zoomFactor, zoomFactor); // Apply zoom factor
     int startingX =
-        (int) ((getWidth() / 2) / zoomFactor); // Center of the component adjusted for zoom
+        (int) (((double) getWidth() / 2) / zoomFactor); // Center of the component adjusted for zoom
     int startingY =
-        (int) ((NODE_HEIGHT / 2) / zoomFactor); // A little offset from the top adjusted for zoom
+        (int) (((double) NODE_HEIGHT / 2) / zoomFactor); // A little offset from the top adjusted for zoom
     drawTree(g2, root, startingX, startingY, getWidth());
   }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Main {
   public static void main(String[] args) {
-    runProgram(getGrammarForm5(), getInput1());
+    runProgram(getGrammarForm1(), getInput1());
   }
 
   private static void runProgram(GrammarForm grammarForm, String[] input) {
